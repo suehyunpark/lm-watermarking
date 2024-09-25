@@ -90,6 +90,7 @@ def main(args):
     ###########################################################################
 
     model, tokenizer, device = load_model(args)
+    print(model)
 
     ###########################################################################
     # Configure the prompt construction partial

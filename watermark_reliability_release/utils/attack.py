@@ -16,6 +16,7 @@
 
 import openai
 import random
+import os
 
 from utils.dipper_attack_pipeline import generate_dipper_paraphrases
 
@@ -43,6 +44,7 @@ def scramble_attack(example, tokenizer=None, args=None):
     return example
 
 
+client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 def gpt_attack(example, attack_prompt=None, args=None):
     assert attack_prompt, "Prompt must be provided for GPT attack"
 
@@ -61,7 +63,7 @@ def gpt_attack(example, attack_prompt=None, args=None):
     # https://github.com/openai/openai-cookbook/blob/main/examples/How_to_handle_rate_limits.ipynb
     @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(25))
     def completion_with_backoff(model, messages, temperature, max_tokens):
-        return openai.ChatCompletion.create(
+        return client.chat.completions.create(
             model=model, messages=messages, temperature=temperature, max_tokens=max_tokens
         )
 

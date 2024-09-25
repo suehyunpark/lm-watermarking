@@ -586,15 +586,15 @@ def main(args):
                 upper_T=target_T + upper_tolerance,
                 lower_T=target_T - lower_tolerance,
             )
-
-        # Save filtered mean values:
-        for metric_name in series_column_names:
-            filtered_name = f"f_{target_T}p{upper_tolerance}m{lower_tolerance}_{metric_name}"
-            try:
-                run.summary[f"{filtered_name}_mean"] = filtered_table[metric_name].mean()
-                run.summary[f"{filtered_name}_std"] = filtered_table[metric_name].std()
-            except TypeError:
-                two_dim_mean = filtered_table[metric_name].apply(np.mean).mean()
+        # print(filtered_table)
+        # # Save filtered mean values:
+        # for metric_name in series_column_names:
+        #     filtered_name = f"f_{target_T}p{upper_tolerance}m{lower_tolerance}_{metric_name}"
+        #     try:
+        #         run.summary[f"{filtered_name}_mean"] = filtered_table[metric_name].mean()
+        #         run.summary[f"{filtered_name}_std"] = filtered_table[metric_name].std()
+        #     except TypeError:
+        #         two_dim_mean = filtered_table[metric_name].apply(np.mean).mean()
 
         ###########################################################################
         # Compute ROC-AUC and send to wandb

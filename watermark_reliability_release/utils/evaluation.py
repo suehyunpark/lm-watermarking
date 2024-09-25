@@ -24,9 +24,9 @@ from metrics.repetition_diversity import (
     dummy_rep_div_result,
 )
 from metrics.p_sp import evaluate_p_sp
-from metrics.detect_retrieval import detect_retrieval
-from metrics.coherence import get_coherence_score
-from metrics.mauve import get_mauve_score
+# from metrics.detect_retrieval import detect_retrieval
+# from metrics.coherence import get_coherence_score
+# from metrics.mauve import get_mauve_score
 from utils.hypothesis_testing import (
     chi_squared_runs_test,
     F_succ_T_runs_dummy_dict_w_bins,
@@ -381,9 +381,9 @@ def load_oracle_model(args):
             oracle_model_name, torch_dtype=torch.float16, device_map="auto"
         )
     else:
-        oracle_model = AutoModelForCausalLM.from_pretrained(oracle_model_name)
+        oracle_model = AutoModelForCausalLM.from_pretrained(oracle_model_name, torch_dtype=torch.bfloat16)
     if "llama" in oracle_model_name:
-        oracle_tokenizer = LlamaTokenizer.from_pretrained(oracle_model_name)
+        oracle_tokenizer = LlamaTokenizer.from_pretrained(oracle_model_name, torch_dtype=torch.bfloat16)
         oracle_model.config.pad_token_id = oracle_tokenizer.pad_token_id = 0  # unk
         oracle_model.config.bos_token_id = 1
         oracle_model.config.eos_token_id = 2

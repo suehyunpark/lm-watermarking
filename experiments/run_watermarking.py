@@ -22,12 +22,12 @@ import matplotlib.pyplot as plt
 # cache path before HF imports just for kicks
 # bc I don't really know when this is pulled by the library
 # TODO change to passing as an arg to the model load fn
-USER = "jkirchen"
+# USER = "suehyun"
 # Huggingface cache
-HF_HOME=f"/cmlscratch/{USER}/.cache/huggingface"
+# HF_HOME=f"/cmlscratch/{USER}/.cache/huggingface"
 # HF_HOME=f"/scratch0/{USER}/.cache/huggingface"
 # HF_HOME=f"/scratch1/{USER}/.cache/huggingface"
-os.environ["HF_HOME"] = HF_HOME
+# os.environ["HF_HOME"] = HF_HOME
 
 print(os.environ["HF_HOME"])
 
@@ -94,7 +94,7 @@ def main(args):
     if "t5" in hf_model_name or "T0" in hf_model_name:
         model = AutoModelForSeq2SeqLM.from_pretrained(hf_model_name)
     else:
-        model = AutoModelForCausalLM.from_pretrained(hf_model_name)
+        model = AutoModelForCausalLM.from_pretrained(hf_model_name, torch_dtype=torch.bfloat16)
 
     tokenizer = AutoTokenizer.from_pretrained(hf_model_name)
 
@@ -116,9 +116,10 @@ def main(args):
                                 subsets=subsets,
                                 streaming=True,
                                 split=None,
-                                ignore_verifications=True)["train"]
+                                ignore_verifications=True,
+                                trust_remote_code=True)["train"]
     else:
-        dataset = load_dataset(dataset_name, dataset_config_name, split="train", streaming=True)
+        dataset = load_dataset(dataset_name, dataset_config_name, split="train", streaming=True, trust_remote_code=True)
     
     # log an example
     ds_iterator = iter(dataset)
@@ -354,9 +355,9 @@ def main(args):
                       f"current generation overhead ratio: {round(len(processed_examples)/(i+1), 3)}",
                       f"completed {round(i/args.limit_indices, 2)} of total")
     
-    print(f"#"*80,
-          f"\nGeneration output length check overhead was num rows processed={len(processed_examples)}",
-          f"for {args.limit_indices} samples. Ratio: {round(len(processed_examples)/args.limit_indices, 3)}")
+        print(f"#"*80,
+            f"\nGeneration output length check overhead was num rows processed={len(processed_examples)}",
+            f"for {args.limit_indices} samples. Ratio: {round(len(processed_examples)/args.limit_indices, 3)}")
     
     ###########################################################################
     # Generation jsonl dumping/loading
@@ -435,7 +436,8 @@ def main(args):
     print(f"Loading oracle model: {oracle_model_name}")
     
     oracle_tokenizer = AutoTokenizer.from_pretrained(oracle_model_name)
-    oracle_model = AutoModelForCausalLM.from_pretrained(oracle_model_name).to(device)
+    # device = "cuda:1"
+    oracle_model = AutoModelForCausalLM.from_pretrained(oracle_model_name, torch_dtype=torch.bfloat16).to(device)
     oracle_model.eval()
 
     # construct fluency/ppl partial

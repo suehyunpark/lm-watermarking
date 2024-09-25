@@ -55,7 +55,7 @@ def load_model(args):
                 args.model_name_or_path, torch_dtype=torch.float16, device_map="auto"
             )
         else:
-            model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path)
+            model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, torch_dtype=torch.bfloat16)
     else:
         raise ValueError(f"Unknown model type: {args.model_name_or_path}")
 
